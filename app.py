@@ -9,14 +9,11 @@ from cs50 import SQL
 import tempfile
 import os
 
-# Configure application
 app = Flask(__name__)
 scheduler = APScheduler()
 
-# Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-# Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
@@ -49,7 +46,6 @@ def login_required(f):
 
     return decorated_function
 
-# Ensure responses aren't cached
 
 
 @app.after_request
@@ -90,7 +86,6 @@ global school
 
 def create_tables(school):
     """Create necessary tables for a new user."""
-    # Create buses table
     db.execute(f"""
     CREATE TABLE IF NOT EXISTS {school}_buses (
         userid INT NOT NULL,
@@ -104,7 +99,6 @@ def create_tables(school):
         )
         """)
 
-    # Create daily_records table
     db.execute(f"""
         CREATE TABLE IF NOT EXISTS {school}_maintain_records (
             userid INT NOT NULL,
@@ -125,40 +119,30 @@ def create_tables(school):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # Forget any user_id
     session.clear()
 
-    # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        # Ensure username was submitted
         if not username:
             return apology("Username not provided", 400)
 
-        # Ensure password was submitted
         if not password:
             return apology("Password not provided", 400)
 
-        # Query database for username
         rows = db.execute(
             "SELECT * FROM users WHERE username = :username", username=username)
-        # rows = [{"id": 1, "username": "test", "hash": generate_password_hash("password")}]
 
-        # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], password):
             return apology("Invalid username and/or password", 400)
 
-        # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
         session['username'] = rows[0]['username']
         session['school'] = rows[0]['school']
 
-        # Redirect user to home page
         flash("Logged In!")
         return redirect("/")
 
-    # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
 
@@ -174,35 +158,28 @@ def logout():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
-    # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
         username = request.form.get("username")
         password = request.form.get("password")
         confirm = request.form.get("confirm")
         school = request.form.get("schoolname").replace(" ", "_")
-        # Ensure username was submitted
         if not username:
             return apology("Inalid username", 400)
 
-        # Ensure password was submitted
         if not password:
             return apology("Invalid password", 400)
 
-        # Ensure confirmation was submitted
         if not confirm:
             return apology("Invalid password confirmation", 400)
 
-        # Ensure password and confirmation match
         if password != confirm:
             return apology("Passwords dont match", 400)
 
         if not school:
             return apology("No school name provided", 400)
-        # Hash user's password
         hash = generate_password_hash(request.form.get("password"))
 
-        # Insert the new user into the database
         rows = db.execute(
             "SELECT * FROM users WHERE username = :username", username=username)
         if len(rows) > 0:
@@ -215,11 +192,9 @@ def register():
 
         create_tables(school)
 
-        # Redirect user to home page
         flash("Succesfully registered! Please login using your credentials")
         return redirect("/")
 
-    # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
 
@@ -229,16 +204,13 @@ def register():
 def index():
     """Show overview of buses and their maintenance records"""
 
-    # Retrieve the school name from the session
     school = session["school"]
 
     if not school:
         return apology("No school information available", 400)
 
-    # Format the school name to match the table names
     school = school.replace(" ", "_")
 
-    # Fetch data from school-specific tables
     buses = db.execute(
         f"SELECT * FROM {school}_buses WHERE userid = :user_id", user_id=session["user_id"])
     records = db.execute(f"""
@@ -253,7 +225,7 @@ def index():
 
 def delete_records():
 
-    school = session["school"]  # Use default_school if no school in session
+    school = session["school"]
     db.execute(f"DELETE FROM {school}_maintain_records WHERE date(today_date) < date('now')")
 
 
@@ -317,12 +289,11 @@ def remove_bus():
         if not value:
             return apology("Value is required", 400)
 
-        # Check if the bus exists
         bus_exists = None
         if identifier == "route_no":
             bus_exists = db.execute(f"SELECT * FROM {school}_buses WHERE RouteNo = :value AND userid = :user_id",
                                     value=value, user_id=session["user_id"])
-        if identifier == "registration_no":
+        elif identifier == "registration_no":
             bus_exists = db.execute(f"SELECT * FROM {school}_buses WHERE RegistrationNo = :value AND userid = :user_id",
                                     value=value, user_id=session["user_id"])
         else:
@@ -331,7 +302,6 @@ def remove_bus():
         if not bus_exists:
             return apology("Bus not found", 400)
 
-        # Remove the bus
         try:
             if identifier == "route_no":
                 db.execute(f"DELETE FROM {school}_buses WHERE RouteNo = :value AND userid = :user_id",
@@ -366,7 +336,6 @@ def update_bus():
             flash("Identifier and value are required!")
             return redirect("/update_bus")
 
-        # Check if the bus exists
         bus_exists = None
         if identifier == "route_no":
             bus_exists = db.execute(
@@ -419,7 +388,7 @@ def update_bus():
                     f"UPDATE {school}_buses SET {set_clause} WHERE RouteNo = :value AND userid = :user_id",
                     **update_fields,
                 )
-            elif identifier == "registration_no":
+            if identifier == "registration_no":
                 db.execute(
                     f"UPDATE {school}_buses SET {set_clause} WHERE RegistrationNo = :value AND userid = :user_id",
                     **update_fields,
@@ -433,6 +402,8 @@ def update_bus():
             return redirect("/update_bus")
 
     return render_template("update_bus.html")
+
+
 
 @app.route("/maintain_records", methods=["POST", "GET"])
 @login_required
@@ -459,7 +430,6 @@ def maintain_records():
                         "Odometer reading and number of students are required!", 400)
                     return redirect("/maintain_records")
 
-                # Check if the bus is already outside
                 bus_outside = db.execute("SELECT * FROM {}_maintain_records WHERE RouteNo = :route_no AND out_flag = 1".format(school),
                                          route_no=route_no)
                 if bus_outside:
@@ -474,7 +444,7 @@ def maintain_records():
                 db.execute("INSERT INTO {}_maintain_records (RouteNo, today_date, students_out, out_odometer, out_time, out_flag, trip_no, userid) VALUES (:route_no, :today_date, :students_out, :out_odometer, :out_time, 1, :trip_no, :user_id)".format(school),
                            route_no=route_no, today_date=today_date, students_out=students_out, out_odometer=out_odometer, out_time=out_time, trip_no=trip_no_new, user_id=user_id)
 
-            elif choice.upper() == "I":
+            if choice.upper() == "I":
                 in_odometer = request.form.get("in_odometer")
                 students_in = request.form.get("students_in")
 
@@ -483,7 +453,6 @@ def maintain_records():
                         "Odometer reading and number of students are required!")
                     return redirect("/maintain_records")
 
-                # Check if the bus is actually outside
                 bus_outside = db.execute("SELECT * FROM {}_maintain_records WHERE RouteNo = :route_no AND out_flag = 1".format(school),
                                          route_no=route_no)
                 if not bus_outside:
@@ -512,7 +481,6 @@ def pending_buses():
         school = session["school"]
         user_id = session["user_id"]
 
-        # Query to get buses with out_flag = 1 (pending buses) by joining the two tables
         buses = db.execute(f"""
             SELECT
                 b.RouteNo,
@@ -550,11 +518,9 @@ def download_report():
     today = datetime.date.today()
 
     try:
-        # Create a temporary file
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.csv')
         filename = temp_file.name
 
-        # Query the database
         query = f"""
         SELECT
             RouteNo AS "Route No",
@@ -570,7 +536,6 @@ def download_report():
         """
         records = db.execute(query, userid=userid)
 
-        # Write the data to a CSV file
         with open(filename, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(fields)
@@ -595,7 +560,5 @@ def download_report():
 
 
 scheduler.add_job(id='Delete Records', func=delete_records,
-                  trigger='cron', hour=0)  # Runs every day at midnight
-
-
+                  trigger='cron', hour=0)
 
