@@ -369,15 +369,23 @@ def update_bus():
         # Check if the bus exists
         bus_exists = None
         if identifier == "route_no":
-            bus_exists = db.execute(f"SELECT * FROM {school}_buses WHERE RouteNo = :value AND userid = :user_id",
-                                    value=value, user_id=session["user_id"])
-        if identifier == "registration_no":
+            bus_exists = db.execute(
+                f"SELECT * FROM {school}_buses WHERE RouteNo = :value AND userid = :user_id",
+                value=value,
+                user_id=session["user_id"],
+            )
+        elif identifier == "registration_no":
             value = value.upper()
-            bus_exists = db.execute(f"SELECT * FROM {school}_buses WHERE RegistrationNo = :value AND userid = :user_id",
-                                    value=value, user_id=session["user_id"])
+            bus_exists = db.execute(
+                f"SELECT * FROM {school}_buses WHERE RegistrationNo = :value AND userid = :user_id",
+                value=value,
+                user_id=session["user_id"],
+            )
         else:
             flash("Invalid identifier!")
             return redirect("/update_bus")
+
+        print(f"Bus exists: {bus_exists}")
 
         if not bus_exists:
             flash("Bus not found!")
@@ -399,27 +407,32 @@ def update_bus():
             flash("No new values provided for update!")
             return redirect("/update_bus")
 
-        set_clause = ", ".join(
-            f"{key} = :{key}" for key in update_fields.keys())
+        set_clause = ", ".join(f"{key} = :{key}" for key in update_fields.keys())
         update_fields["value"] = value
         update_fields["user_id"] = session["user_id"]
 
+        print(f"Update fields: {update_fields}")
+
         try:
             if identifier == "route_no":
-                db.execute(f"UPDATE {school}_buses SET {set_clause} WHERE RouteNo = :value AND userid = :user_id",
-                           **update_fields)
-            if identifier == "registration_no":
-                db.execute(f"UPDATE {school}_buses SET {set_clause} WHERE RegistrationNo = :value AND userid = :user_id",
-                           **update_fields)
+                db.execute(
+                    f"UPDATE {school}_buses SET {set_clause} WHERE RouteNo = :value AND userid = :user_id",
+                    **update_fields,
+                )
+            elif identifier == "registration_no":
+                db.execute(
+                    f"UPDATE {school}_buses SET {set_clause} WHERE RegistrationNo = :value AND userid = :user_id",
+                    **update_fields,
+                )
 
             flash("Bus details successfully updated!")
             return redirect("/")
         except Exception as e:
             flash(f"An error occurred: {e}")
+            print(f"Exception: {e}")
             return redirect("/update_bus")
 
     return render_template("update_bus.html")
-
 
 @app.route("/maintain_records", methods=["POST", "GET"])
 @login_required
