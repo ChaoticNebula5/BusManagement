@@ -1,0 +1,43 @@
+:root {
+    --primary-blue: #1A5F7A;
+    --secondary-teal: #159895;
+    --accent-orange: #FFA41B;
+    --light-bg: #F9F5EB;
+    --dark-text: #002B5B;
+}
+body {
+    font-family: 'Ubuntu', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+}
+.navbar {
+    background-color: var(--primary-blue);
+}
+.navbar-brand, .nav-link {
+    color: var(--light-bg) !important;
+}
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(249, 245, 235, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+.btn-primary {
+    background-color: var(--secondary-teal);
+    border-color: var(--secondary-teal);
+    color: var(--light-bg);
+}
+.btn-primary:hover {
+    background-color: var(--accent-orange);
+    border-color: var (--accent-orange);
+}
+.card {
+    background-color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.card-header {
+    background-color: var(--secondary-teal);
+    color: var(--light-bg);
+}
+footer {
+    background-color: var(--primary-blue);
+    color: var(--light-bg);
+}

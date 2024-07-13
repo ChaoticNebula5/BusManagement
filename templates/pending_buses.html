@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Pending Buses
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4 text-center">Pending Buses</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Route Number</th>
+                <th>Driver's Name</th>
+                <th>Conductor's Name</th>
+                <th>Registration Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bus in buses %}
+            <tr>
+                <td>{{ bus.RouteNo }}</td>
+                <td>{{ bus.NameOfDriver }}</td>
+                <td>{{ bus.NameOfConductor }}</td>
+                <td>{{ bus.RegistrationNo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

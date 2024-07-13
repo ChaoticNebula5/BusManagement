@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4 text-center">Dashboard</h2>
+    <h3 class="my-4">Buses</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Registration Number</th>
+                <th>Driver's Name</th>
+                <th>Conductor's Name</th>
+                <th>Number of Students</th>
+                <th>Route Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bus in buses %}
+            <tr>
+                <td>{{ bus.RegistrationNo }}</td>
+                <td>{{ bus.NameOfDriver }}</td>
+                <td>{{ bus.NameOfConductor }}</td>
+                <td>{{ bus.NumberOfStudents }}</td>
+                <td>{{ bus.RouteNo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="my-4">Maintenance Records</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Route No</th>
+                <th>Out Time</th>
+                <th>Out Odometer</th>
+                <th>Students Out</th>
+                <th>In Time</th>
+                <th>In Odometer</th>
+                <th>Students In</th>
+                <th>Status</th>
+                <th>Trip No</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.today_date }}</td>
+                <td>{{ record.RouteNo }}</td>
+                <td>{{ record.out_time }}</td>
+                <td>{{ record.out_odometer }}</td>
+                <td>{{ record.students_out }}</td>
+                <td>{{ record.in_time }}</td>
+                <td>{{ record.in_odometer }}</td>
+                <td>{{ record.students_in }}</td>
+                <td>{{ "Bus outside campus" if record.out_flag == 1 else "Bus inside campus" }}</td>
+                <td>{{ record.trip_no }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

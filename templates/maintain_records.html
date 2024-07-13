@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Maintain Records
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Maintain Bus Records</h2>
+    {% if update_another %}
+        <div class="alert alert-success text-center">
+            Bus record updated successfully.
+        </div>
+        <div class="d-flex justify-content-center">
+            <a href="/maintain_records" class="btn btn-primary me-2">Update Another Bus</a>
+            <a href="/" class="btn btn-secondary">Return to Homepage</a>
+        </div>
+    {% else %}
+        <form action="/maintain_records" method="POST">
+            <div class="mb-3 text-center">
+                <label for="choice" class="form-label">Do you want to update the record for a bus going outside or coming into the school?</label>
+                <select id="choice" name="choice" class="form-select" required>
+                    <option value="" disabled selected>Choose method</option>
+                    <option value="O">Going Outside</option>
+                    <option value="I">Coming Inside</option>
+                </select>
+            </div>
+            <div class="mb-3 text-center">
+                <label for="route_no" class="form-label">Bus Route Number</label>
+                <input type="text" id="route_no" name="route_no" class="form-control" required>
+            </div>
+            <div id="outgoing-fields" class="mb-3 text-center" style="display: none;">
+                <label for="students_out" class="form-label">Number of Students Out</label>
+                <input type="number" id="students_out" name="students_out" class="form-control">
+                <label for="out_odometer" class="form-label mt-2">Outgoing Odometer Reading</label>
+                <input type="number" id="out_odometer" name="out_odometer" class="form-control">
+            </div>
+            <div id="incoming-fields" class="mb-3 text-center" style="display: none;">
+                <label for="students_in" class="form-label">Number of Students In</label>
+                <input type="number" id="students_in" name="students_in" class="form-control">
+                <label for="in_odometer" class="form-label mt-2">Incoming Odometer Reading</label>
+                <input type="number" id="in_odometer" name="in_odometer" class="form-control">
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Update Record</button>
+            </div>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    document.getElementById('choice').addEventListener('change', function() {
+        if (this.value === 'O') {
+            document.getElementById('outgoing-fields').style.display = 'block';
+            document.getElementById('incoming-fields').style.display = 'none';
+        } else if (this.value === 'I') {
+            document.getElementById('outgoing-fields').style.display = 'none';
+            document.getElementById('incoming-fields').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

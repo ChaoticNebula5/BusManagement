@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Remove Bus</h2>
+    <form method="POST" action="/remove_bus">
+        <div class="mb-3">
+            <label for="identifier" class="form-label">Choose Method</label>
+            <select name="identifier" id="identifier" class="form-control">
+                <option value="" disabled selected>Choose method</option>
+                <option value="route_no">Route No</option>
+                <option value="registration_no">Registration No</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="value" class="form-label">Value</label>
+            <input type="text" class="form-control" id="value" name="value">
+        </div>
+        <button type="submit" class="btn btn-danger mt-3" style="display:block; margin: 0 auto;">Remove Bus</button>
+    </form>
+</div>
+
+<script>
+    function updateLabel(value) {
+        const valueLabel = document.getElementById("value-label");
+        if (value === "route_no") {
+            valueLabel.textContent = "Route Number:";
+        } else if (value === "registration_no") {
+            valueLabel.textContent = "Registration Number:";
+        } else {
+            valueLabel.textContent = "Value:";
+        }
+    }
+</script>
+{% endblock %}
